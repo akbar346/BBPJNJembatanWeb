@@ -1,14 +1,11 @@
-<?php
-
-defined('BASEPATH') OR exit('No direct script access allowed');
-
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
 class Kerusakan extends CI_Controller {
-
     function __construct() {
         parent::__construct();
         $this->load->model('Kategori_m');
         $this->load->model('Perbaikan_m');
         $this->load->model('Tingkat_m');
+        $this->load->model('Kerusakan_m');
         $this->Layout_m->Check_Login();
     }
 
@@ -584,4 +581,89 @@ class Kerusakan extends CI_Controller {
         echo json_encode($return);
     }
 
+    function histori(){
+        $data['namaMenu'] = "Histori Kerusakan";
+
+        $data['parent_id_menu'] = $this->Layout_m->getMenuParent($data['namaMenu']);
+        $data['id_menu_'] = $this->Layout_m->checkMenu($data['namaMenu']);
+
+        $data['setMeta'] = $this->Layout_m->setMeta($data['namaMenu']);
+        $data['setHeader'] = $this->Layout_m->setHeader();
+        $data['setMenu'] = $this->Layout_m->setMenu();
+        $data['setFooter'] = $this->Layout_m->setFooter();
+        $data['setJS'] = $this->Layout_m->setJS();
+
+        $this->parser->parse('kerusakan/histori_v', $data);
+    }
+
+    function do_Tabel_Histori() {
+        $records["aaData"] = array();
+        $aColumns = array('id_kerusakan');
+        //default
+        $sort = "tk.id_kerusakan";
+        $dir = "desc";
+        $criteria = "";
+
+        $sSearch = ($this->input->post("sSearch") != "") ? strtoupper(quotes_to_entities($this->input->post("sSearch"))) : "";
+        $iDisplayLength = ($this->input->post("iDisplayLength") != "") ? $this->input->post("iDisplayLength") : "";
+        $iDisplayStart = ($this->input->post("iDisplayStart") != "") ? $this->input->post("iDisplayStart") : "";
+        $sEcho = ($this->input->post("sEcho") != "") ? $this->input->post("sEcho") : "";
+
+        // Shorting
+        $iSortCol_0 = ($this->input->post("iSortCol_0") != "") ? $this->input->post("iSortCol_0") : "";
+        $iSortingCols = ($this->input->post("iSortingCols") != "") ? $this->input->post("iSortingCols") : "";
+        if ($iSortCol_0) {
+            for ($i = 0; $i < intval($iSortingCols); $i++) {
+                $sort = $aColumns[intval($this->input->post('iSortCol_' . $i))];
+                $dir = ($this->input->post('sSortDir_' . $i) != "") ? $this->input->post('sSortDir_' . $i) : "";
+            }
+        }
+        $iTotalRecords = $this->Kerusakan_m->getCount($criteria, $sSearch);
+
+        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+
+        $records["sEcho"] = $sEcho;
+        $records["iTotalRecords"] = $iTotalRecords;
+        $records["iTotalDisplayRecords"] = $iTotalRecords;
+
+        $query = $this->Kerusakan_m->get($criteria, $sSearch, $sort, $dir, $iDisplayStart, $iDisplayLength);
+
+        if ($query->num_rows() > 0) {
+            $no = $iDisplayStart;
+            foreach ($query->result() as $Fields) {
+                $no++;
+                $records["aaData"][] = array(
+                    '<center>' . $no . '.</center>',
+                    $Fields->nip_input,
+                    $Fields->nama_input,
+                    $Fields->jabatan_input,
+                    $Fields->nama_kategori,
+                    $Fields->nama_kerusakan,
+                    $Fields->ket_perbaikan,
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_1.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_2.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    $Fields->detail_kerusakan,
+                    $Fields->tgl_pengecekan,
+                    $Fields->nip_proses,
+                    $Fields->nama_proses,
+                    $Fields->jabatan_proses,
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_proses_1.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_proses_2.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    $Fields->tgl_proses,
+                    $Fields->nip_selesai,
+                    $Fields->nama_selesai,
+                    $Fields->jabatan_selesai,
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_selesai_1.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    '<a href="'.base_url().'assets/upload/perbaikan/'.$Fields->gambar_selesai_2.'" target="_blank" class="btn btn-xs yellow">Lihat</a>',
+                    $Fields->tgl_selesai,
+                    $Fields->nama_status,
+                    $Fields->nama_tingkat,
+                    $Fields->nama_satker,
+                    $Fields->nama_ppk,
+                    '<center><a href="javascript:;" data-id="' . $Fields->id_kerusakan . '" data-name="' . $Fields->id_kerusakan . '" class="btn btn-xs yellow btn-editable"><i class="fa fa-pencil"></i> Ubah</a> '
+                    . '<a href="javascript:;" data-id="' . $Fields->id_kerusakan . '" data-name="' . $Fields->id_kerusakan . '" class="btn btn-xs red btn-removable"><i class="fa fa-times"></i> Hapus</a></center>');
+            }
+        }
+        echo json_encode($records);
+    }
 }

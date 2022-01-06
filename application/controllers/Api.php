@@ -223,7 +223,6 @@ class Api extends CI_Controller {
         );
 
         $this->Data_m->Add('t_kerusakan', $data);
-
         if ($this->db->trans_status() === FALSE) {
             $msg['success'] = FALSE;
             $msg['message'] = 'Data gagal disimpan';
@@ -513,6 +512,7 @@ class Api extends CI_Controller {
     }
 
     function ubah_PenilikJalan(){
+        $data = array();
         date_default_timezone_set('Asia/Jakarta');
         $id_kerusakan = ($this->input->post('id_kerusakan') != "") ? $this->input->post('id_kerusakan') : "";
         $id_user = ($this->input->post('id_user') != "") ? $this->input->post('id_user') : "";
@@ -539,8 +539,8 @@ class Api extends CI_Controller {
             $data = array(
                 'gambar_proses_1'  => $nama_file1,
                 'gambar_proses_2'  => $nama_file2,
-                'status'        => $status,
-                'id_user'        => $id_user,
+                'status'        => 2,
+                'id_user_proses'        => $id_user,
                 'tgl_proses'      => date("Y-m-d H:i")
             );
         }else if($status == '3'){
@@ -559,8 +559,8 @@ class Api extends CI_Controller {
             $data = array(
                 'gambar_selesai_1'  => $nama_file1,
                 'gambar_selesai_2'  => $nama_file2,
-                'status'        => $status,
-                'id_user'        => $id_user,
+                'status'        => 3,
+                'id_user_selesai'        => $id_user,
                 'tgl_selesai'      => date("Y-m-d H:i")
             );
         }
