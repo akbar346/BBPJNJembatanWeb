@@ -666,4 +666,76 @@ class Kerusakan extends CI_Controller {
         }
         echo json_encode($records);
     }
+
+    function laporan(){
+        $data['namaMenu'] = "Laporan Kerusakan";
+
+        $data['parent_id_menu'] = $this->Layout_m->getMenuParent($data['namaMenu']);
+        $data['id_menu_'] = $this->Layout_m->checkMenu($data['namaMenu']);
+
+        $data['setMeta'] = $this->Layout_m->setMeta($data['namaMenu']);
+        $data['setHeader'] = $this->Layout_m->setHeader();
+        $data['setMenu'] = $this->Layout_m->setMenu();
+        $data['setFooter'] = $this->Layout_m->setFooter();
+        $data['setJS'] = $this->Layout_m->setJS();
+
+        $this->parser->parse('kerusakan/laporan_v', $data);
+    }
+
+    function checkLaporan(){
+        $tahun = ($this->input->post('tahun') != "") ? $this->input->post('tahun') : "";
+        $hasil = $this->db->query("select * from t_kerusakan where date_part('year', tgl_ins) = $tahun");
+
+        if($hasil->num_rows() > 0){
+            $data['success'] = TRUE;
+            $data['message'] = 'Load Sukses';
+        }else{
+            $data['success'] = FALSE;
+            $data['message'] = 'Load Gagal';
+        }
+		echo json_encode($data);
+    }
+
+    function export($tahun){
+        // panggil library yang kita buat sebelumnya yang bernama pdfgenerator
+        $this->load->library('pdfgenerator');
+    
+        // title dari pdf
+        $data['title_pdf'] = 'Laporan Kerusakan Jalan tahun '.$tahun;
+
+        $data['hasil'] = $this->db->query("
+            select tk.id_kerusakan, tk.id_user id_input, mu.nip nip_input, mu.nama_lengkap nama_input, mu.no_hp hp_input, mjp.nama_jabatan jabatan_input, tk.id_kategori, mk.kode_kategori, mk.nama_kategori, tk.id_perbaikan, mp.kode_kerusakan, mp.nama_kerusakan, mp.ket_perbaikan, mp.marker, tk.gambar_1, tk.gambar_2, tk.tgl_pengecekan, tk.detail_kerusakan,
+            tk.id_user_proses, mu2.nip nip_proses, mu2.nama_lengkap nama_proses, mu2.no_hp hp_proses, mjpp.nama_jabatan jabatan_proses, tk.gambar_proses_1, tk.gambar_proses_2, tk.tgl_proses,
+            tk.id_user_selesai, mu3.nip nip_selesai, mu3.nama_lengkap nama_selesai, mu3.no_hp hp_selesai, mjs.nama_jabatan jabatan_selesai, tk.gambar_selesai_1, tk.gambar_selesai_2, tk.tgl_selesai,
+            ms2.id_status, ms2.nama_status, tk.id_tingkat, mt.nama_tingkat, ms.id_satker, ms.kode_satker, ms.nama_satker, mp2.id_ppk, mp2.kode_ppk, mp2.nama_ppk, tk.lat, tk.lng, tk.tgl_ins 
+            from t_kerusakan tk
+            inner join m_user mu on tk.id_user = mu.id_user
+            inner join m_jabatan mjp on mu.id_jabatan = mjp.id_jabatan
+            inner join m_kategori mk on tk.id_kategori = mk.id_kategori 
+            inner join m_perbaikan mp on tk.id_perbaikan = mp.id_perbaikan
+            inner join m_tingkat mt on tk.id_tingkat = mt.id_tingkat
+            inner join m_status ms2 on tk.status = ms2.id_status 
+            left join m_user mu2 on tk.id_user_proses = mu2.id_user
+            left join m_jabatan mjpp on mu2.id_jabatan = mjpp.id_jabatan
+            left join m_user mu3 on tk.id_user_selesai = mu3.id_user
+            left join m_jabatan mjs on mu3.id_jabatan = mjs.id_jabatan
+            inner join m_satker ms on tk.id_satker = ms.id_satker 
+            inner join m_ppk mp2 on tk.id_ppk = mp2.id_ppk
+            WHERE date_part('year', tgl_ins) = $tahun
+        ");
+        
+        // filename dari pdf ketika didownload
+        $file_pdf = 'laporan_penjualan_toko_kita';
+        // setting paper
+        $paper = 'A4';
+        //orientasi paper potrait / landscape
+        $orientation = "landscape";
+        
+        $html = $this->load->view('kerusakan/laporan_pdf', $data, true);	    
+        
+        // run dompdf
+        $this->pdfgenerator->generate($html, $file_pdf,$paper,$orientation);
+
+        header('Content-type: application/pdf');
+    }
 }

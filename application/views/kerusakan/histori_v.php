@@ -17,6 +17,22 @@
                     <ul class="page-breadcrumb breadcrumb"></ul>
                     <div class="row">
                         <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="select2me form-control" id="tahun">
+                                        <option value="">awf</option>
+                                        <?php
+                                            foreach(range(2020, date('Y') + 1) as $year) {
+                                                echo '<option value="'.$year.'">'.$year.'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button target="_blank" class="btn btn-primary btn-block" id="export" disabled>EXPORT</button>
+                                </div>
+                            </div>
+                            </br>
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -81,6 +97,36 @@
                 $('#{parent_id_menu}').addClass('active');
                 $('#{id_menu_}').addClass('active');
 
+                $('#tahun').select2({
+                    placeholder: "Pilih Tahun"
+                });
+                
+                $('#export').on('click', function() {
+                    var tahun = $('#tahun').val();
+                    window.open('<?= site_url() ?>kerusakan/export/'+tahun,'_blank');
+                });
+
+                $('#tahun').on("change", function (e) {
+                    var tahun = $('#tahun').val();
+                    
+                    $.ajax({
+                        method: 'POST',
+                        dataType: 'json',
+                        url: '<?= site_url() ?>kerusakan/checkLaporan',
+                        data: {'tahun':tahun},
+                        success: function (data) {
+                            if (data.success === true) {
+                                document.getElementById("export").disabled = false;
+                            } else {
+                                document.getElementById("export").disabled = true;
+                            }
+                        },
+                        fail: function (e) {
+                            toastr.error(e);
+                        }
+                    });
+                });
+                
                 var InitController = function () {
                     var handleTable = function () {
                         if (!jQuery().dataTable) {
