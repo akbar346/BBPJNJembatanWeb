@@ -684,7 +684,7 @@ class Kerusakan extends CI_Controller {
 
     function checkLaporan(){
         $tahun = ($this->input->post('tahun') != "") ? $this->input->post('tahun') : "";
-        $hasil = $this->db->query("select * from t_kerusakan where date_part('year', tgl_ins) = $tahun");
+        $hasil = $this->db->query("select * from t_kerusakan where EXTRACT(YEAR FROM tgl_ins) = '$tahun'");
 
         if($hasil->num_rows() > 0){
             $data['success'] = TRUE;
@@ -701,7 +701,7 @@ class Kerusakan extends CI_Controller {
         $this->load->library('pdfgenerator');
     
         // title dari pdf
-        $data['title_pdf'] = 'Laporan Kerusakan Jalan tahun '.$tahun;
+        $data['title_pdf'] = 'Laporan Kerusakan Jembatan tahun '.$tahun;
 
         $data['hasil'] = $this->db->query("
             select tk.id_kerusakan, tk.id_user id_input, mu.nip nip_input, mu.nama_lengkap nama_input, mu.no_hp hp_input, mjp.nama_jabatan jabatan_input, tk.id_kategori, mk.kode_kategori, mk.nama_kategori, tk.id_perbaikan, mp.kode_kerusakan, mp.nama_kerusakan, mp.ket_perbaikan, mp.marker, tk.gambar_1, tk.gambar_2, tk.tgl_pengecekan, tk.detail_kerusakan,
@@ -721,11 +721,11 @@ class Kerusakan extends CI_Controller {
             left join m_jabatan mjs on mu3.id_jabatan = mjs.id_jabatan
             inner join m_satker ms on tk.id_satker = ms.id_satker 
             inner join m_ppk mp2 on tk.id_ppk = mp2.id_ppk
-            WHERE date_part('year', tgl_ins) = $tahun
+            WHERE EXTRACT(YEAR FROM tgl_ins) = $tahun
         ");
         
         // filename dari pdf ketika didownload
-        $file_pdf = 'laporan_penjualan_toko_kita';
+        $file_pdf = 'Laporan Kerusakan Jembatan tahun '.$tahun;
         // setting paper
         $paper = 'A4';
         //orientasi paper potrait / landscape

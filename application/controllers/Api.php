@@ -445,9 +445,9 @@ class Api extends CI_Controller {
     }
 
     function penilikJalanMapsId(){
-        $id_kerusakan = ($this->input->post('id_kerusakan') != "") ? $this->input->post('id_kerusakan') : "";
-        $limit = ($this->input->post('limit') != "") ? $this->input->post('limit') : "";
-        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";;
+        $id_kerusakan = ($this->input->post('id_kerusakan') != "") ? $this->input->post('id_kerusakan') : null;
+        $limit = ($this->input->post('limit') != "") ? $this->input->post('limit') : null;
+        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : null;
         $hasil = $this->Data_m->GetDataJalanMaps('tk.id_kerusakan', $id_kerusakan, $limit, $offset);
         
         if ($hasil->num_rows() > 0) {
@@ -673,5 +673,72 @@ class Api extends CI_Controller {
             $msg['message'] = 'Password berhasil diubah.';
         }
         echo json_encode($msg);
+    }
+
+    function do_forgot(){
+        $return = array();
+
+        $nip = $this->input->post("nip");
+        $email = $this->input->post("email");
+        $passwd = random_string('numeric', 4);
+
+        $dataUser = $this->db->query("SELECT * FROM m_user WHERE nip = '$nip' AND email = '$email'")->row();
+
+        if(!empty($dataUser)){
+            $config = [
+                'mailtype'  => 'html',
+                'charset'   => 'utf-8',
+                'protocol'  => 'smtp',
+                'smtp_host' => 'smtp.gmail.com',
+                'smtp_user' => 'alumni@unusa.ac.id',  // Email gmail
+                'smtp_pass'   => 'AlumniUnusa21',  // Password gmail
+                'smtp_crypto' => 'ssl',
+                'smtp_port'   => 465,
+                'crlf'    => "\r\n",
+                'newline' => "\r\n"
+            ];
+    
+            // Load library email dan konfigurasinya
+            $this->load->library('email', $config);
+            $this->email->from('alumni@unusa.ac.id', 'BBPJN VIII');
+            $this->email->to($dataUser->email);
+            $this->email->subject('Lupa Password | BBPJN VIII');
+            $this->email->message('
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=' . strtolower(config_item('charset')) . '" />
+                    <title>Verifikasi Email Tracer Study</title>
+                    <style type="text/css">
+                        body {
+                            font-family: Arial, Verdana, Helvetica, sans-serif;
+                            font-size: 16px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h3 style="font-weight:normal">Terimakasih telah melakukan reset password, password terbaru Anda adalah <b>'. $passwd .'</b></h3>
+                </body>
+                </html>
+            ');
+    
+            if($this->email->send()){
+                $this->db->update('m_user', array('passwd'=>md5($passwd)), array('nip'=>$nip, 'email'=>$email));
+                if ($this->db->trans_status() === FALSE) {
+                    $return["message"] = "Reset password telah gagal!";
+                    $return["success"] = FALSE;
+                } else {
+                    $return["message"] = "Reset password telah berhasil, Silahkan check email Anda";
+                    $return["success"] = TRUE;
+                }
+            }else{
+                $return["message"] = "Email tidak terkirim!";
+                $return["success"] = FALSE;
+            }
+        }else{
+            $return["success"] = FALSE;
+            $return["message"] = "Anda belum terdaftar, lakukan pendaftaran terlebih dahulu!";
+        }
+        echo json_encode($return);
     }
 }

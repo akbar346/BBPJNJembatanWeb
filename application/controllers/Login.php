@@ -25,7 +25,7 @@ class Login extends CI_Controller {
 
         if ($json->num_rows() > 0) {
             $fields = $json->row();
-            if ($fields->status == "t") {
+            if ($fields->status == "t" || $fields->status == "1") {
                 $newdata = array(
                     "id_user" => $fields->id_user,
                     "nip" => $fields->nip,

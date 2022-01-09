@@ -765,7 +765,7 @@ class Master extends CI_Controller {
             $no = $iDisplayStart;
             foreach ($query->result() as $Fields) {
                 $no++;
-                $status = ($Fields->status == 't') ? "Akfif" : "Tidak Aktif";
+                $status = ($Fields->status == 't' || $Fields->status == '1') ? "Akfif" : "Tidak Aktif";
 
                 $btnTTD = "";
                 if ($Fields->foto != "") {

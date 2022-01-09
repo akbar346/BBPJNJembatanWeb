@@ -41,7 +41,7 @@ class Data_m extends CI_Model {
 	}
 
 	function GetDataJalanMaps($id, $where, $limit, $offset){
-		$query = $this->db->query("
+		$query = "
 			select tk.id_kerusakan, tk.id_user id_input, mu.nip nip_input, mu.nama_lengkap nama_input, mu.no_hp hp_input, mjp.nama_jabatan jabatan_input, tk.id_kategori, mk.kode_kategori, mk.nama_kategori, tk.id_perbaikan, mp.kode_kerusakan, mp.nama_kerusakan, mp.ket_perbaikan, mp.marker, tk.gambar_1, tk.gambar_2, tk.tgl_pengecekan, tk.detail_kerusakan,
 			tk.id_user_proses, mu2.nip nip_proses, mu2.nama_lengkap nama_proses, mu2.no_hp hp_proses, mjpp.nama_jabatan jabatan_proses, tk.gambar_proses_1, tk.gambar_proses_2, tk.tgl_proses,
 			tk.id_user_selesai, mu3.nip nip_selesai, mu3.nama_lengkap nama_selesai, mu3.no_hp hp_selesai, mjs.nama_jabatan jabatan_selesai, tk.gambar_selesai_1, tk.gambar_selesai_2, tk.tgl_selesai,
@@ -61,8 +61,16 @@ class Data_m extends CI_Model {
 			inner join m_ppk mp2 on tk.id_ppk = mp2.id_ppk
 			WHERE $id = $where
 			ORDER BY tk.id_kerusakan ASC
-			LIMIT $limit offset $offset
-		");
-		return $query;
+		";
+
+		if ($limit != "" && $limit != "") {
+            $query .= "LIMIT $limit ";
+		}
+		
+		if ($offset != "" && $offset != "") {
+            $query .= "offset $offset";
+        }
+		
+		return $this->db->query($query);
 	}
 }
