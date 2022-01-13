@@ -40,7 +40,7 @@ class Data_m extends CI_Model {
 		return $query;
 	}
 
-	function GetDataJalanMaps($id, $where, $limit, $offset){
+	function GetDataJalanMaps($id, $where, $limit, $offset, $kondisi = ""){
 		$query = "
 			select tk.id_kerusakan, tk.id_user id_input, mu.nip nip_input, mu.nama_lengkap nama_input, mu.no_hp hp_input, mjp.nama_jabatan jabatan_input, tk.id_kategori, mk.kode_kategori, mk.nama_kategori, tk.id_perbaikan, mp.kode_kerusakan, mp.nama_kerusakan, mp.ket_perbaikan, mp.marker, tk.gambar_1, tk.gambar_2, tk.tgl_pengecekan, tk.detail_kerusakan,
 			tk.id_user_proses, mu2.nip nip_proses, mu2.nama_lengkap nama_proses, mu2.no_hp hp_proses, mjpp.nama_jabatan jabatan_proses, tk.gambar_proses_1, tk.gambar_proses_2, tk.tgl_proses,
@@ -59,7 +59,12 @@ class Data_m extends CI_Model {
 			left join m_jabatan mjs on mu3.id_jabatan = mjs.id_jabatan
 			inner join m_satker ms on tk.id_satker = ms.id_satker 
 			inner join m_ppk mp2 on tk.id_ppk = mp2.id_ppk
-			WHERE $id = $where
+			WHERE $id = $where 
+		";
+		if ($kondisi == "hilang"){
+			$query .= "AND tk.status != 3";
+		}
+		$query .= "
 			ORDER BY tk.id_kerusakan ASC
 		";
 

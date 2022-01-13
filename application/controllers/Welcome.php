@@ -22,10 +22,11 @@ class Welcome extends CI_Controller {
         $data['setJS'] = $this->Layout_m->setJS();
 
         date_default_timezone_set('Asia/Jakarta');
-
+        $tahun = date('Y');
         $data['jmlUser'] = $this->db->get("m_user")->num_rows();
         $data['jmlSatker'] = $this->db->get("m_satker")->num_rows();
         $data['jmlPpk'] = $this->db->get("m_ppk")->num_rows();
+        $data['jmlData'] = $this->db->query("select * from t_kerusakan where EXTRACT(YEAR FROM tgl_ins) = '$tahun'")->num_rows();
         
         $data['kategori'] = $this->db->get("m_kategori")->num_rows();
         $data['perbaikan'] = $this->db->get("m_perbaikan")->num_rows();

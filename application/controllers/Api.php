@@ -246,8 +246,12 @@ class Api extends CI_Controller {
     function penilikJalanMapsPegawai(){
         $id_user = ($this->input->post('id_user') != "") ? $this->input->post('id_user') : "";
         $limit = ($this->input->post('limit') != "") ? $this->input->post('limit') : "";
-        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";;
-        $hasil = $this->Data_m->GetDataJalanMaps('tk.id_user', $id_user, $limit, $offset);
+        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";
+        if($limit == "" AND $offset == ""){
+            $hasil = $this->Data_m->GetDataJalanMaps('tk.id_user', $id_user, $limit, $offset, 'hilang');
+        }else{
+            $hasil = $this->Data_m->GetDataJalanMaps('tk.id_user', $id_user, $limit, $offset, '');
+        }
         
         if ($hasil->num_rows() > 0) {
             foreach ($hasil->result() as $r) {
@@ -313,8 +317,12 @@ class Api extends CI_Controller {
     function penilikJalanMapsPpk(){
         $id_ppk = ($this->input->post('id_ppk') != "") ? $this->input->post('id_ppk') : "";
         $limit = ($this->input->post('limit') != "") ? $this->input->post('limit') : "";
-        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";;
-        $hasil = $this->Data_m->GetDataJalanMaps('mp2.id_ppk', $id_ppk, $limit, $offset);
+        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";
+        if($limit == "" && $offset == ""){
+            $hasil = $this->Data_m->GetDataJalanMaps('mp2.id_ppk', $id_ppk, $limit, $offset, 'hilang');
+        }else{
+            $hasil = $this->Data_m->GetDataJalanMaps('mp2.id_ppk', $id_ppk, $limit, $offset, '');
+        }
         
         if ($hasil->num_rows() > 0) {
             foreach ($hasil->result() as $r) {
@@ -380,8 +388,12 @@ class Api extends CI_Controller {
     function penilikJalanMapsSatker(){
         $id_satker = ($this->input->post('id_satker') != "") ? $this->input->post('id_satker') : "";
         $limit = ($this->input->post('limit') != "") ? $this->input->post('limit') : "";
-        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";;
-        $hasil = $this->Data_m->GetDataJalanMaps('ms.id_satker', $id_satker, $limit, $offset);
+        $offset = ($this->input->post('offset') != "") ? $this->input->post('offset') : "";
+        if($limit == "" AND $offset == ""){
+            $hasil = $this->Data_m->GetDataJalanMaps('ms.id_satker', $id_satker, $limit, $offset, 'hilang');
+        }else{
+            $hasil = $this->Data_m->GetDataJalanMaps('ms.id_satker', $id_satker, $limit, $offset, '');
+        }
         
         if ($hasil->num_rows() > 0) {
             foreach ($hasil->result() as $r) {

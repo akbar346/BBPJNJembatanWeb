@@ -65,7 +65,7 @@
                                 </div>
                                 <div class="details">
                                     <div class="number">
-                                        <span>0</span>
+                                    <span><?= number_format($jmlData) ?></span>
                                     </div>
                                     <div class="desc"> Jumlah Laporan Tahun <?= date('Y') ?> </div>
                                 </div>
